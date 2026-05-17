@@ -4,7 +4,7 @@ import smallworld
 import logging
 import struct
 
-from mpu import AddMpuRegionModel, SetMpuEnableModel, ADD_MPU_REGION_ADDR, SET_MPU_ENABLE_ADDR
+from mpu import AddMpuRegionModel, SetMpuEnableModel, ConfigureMpuSubregion, RUN_IN_USER_JAIL_ADDR, run_in_user_jail_start
 from mmio.fuses import ProdFuseModel, EntitlementFuseModel, SecFlagsFuseModel, UnkFusesModel, FuseCalibrationControllerModel
 from mmio.gpio import GpioModel, DebugStatusModel
 from mmio.sysctrl import SystemControlModel, SystemStatusModel
@@ -25,8 +25,8 @@ class IgnoreAccess(smallworld.state.models.MemoryMappedModel):
         pass
 
 # Set up logging
-#smallworld.logging.setup_logging(level=logging.INFO)
-smallworld.logging.setup_logging(level=logging.DEBUG)
+smallworld.logging.setup_logging(level=logging.INFO)
+#smallworld.logging.setup_logging(level=logging.DEBUG)
 
 # Define the platform
 platform = smallworld.platforms.Platform(
@@ -70,8 +70,9 @@ cpu.pc.set(code.address)
 machine.add_exit_point(0xffff_276e)
 
 # Add MPU configuration function models
-machine.add(AddMpuRegionModel(ADD_MPU_REGION_ADDR))
-machine.add(SetMpuEnableModel(SET_MPU_ENABLE_ADDR))
+machine.add(AddMpuRegionModel())
+machine.add(SetMpuEnableModel())
+machine.add(ConfigureMpuSubregion())
 
 # Add GPIO MMIO device
 machine.add(GpioModel())
@@ -161,6 +162,9 @@ machine.add(CryptoEngineModel())
 
 # Create a unicorn emulator.
 unicorn = smallworld.emulators.UnicornEmulator(platform)
+
+# Add hook to start of `run_in_usr_jail` function to print out the jail entrypoint
+unicorn.hook_instruction(RUN_IN_USER_JAIL_ADDR, run_in_user_jail_start)
 
 # Emulate our machine
 machine = machine.emulate(unicorn)

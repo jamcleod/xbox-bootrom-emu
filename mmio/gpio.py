@@ -37,7 +37,7 @@ class GpioModel(smallworld.state.models.MemoryMappedModel):
                 return self.gpio_enable_read()
 
             case _:
-                raise NotImplemented(f"Invalid GPIO MMIO access address {hex(addr)}")
+                raise NotImplementedError(f"Invalid GPIO MMIO access address {hex(addr)}")
 
     def on_write(self, emu, addr, size, data) -> bytes:
         assert size == 4
@@ -52,7 +52,7 @@ class GpioModel(smallworld.state.models.MemoryMappedModel):
                 return self.gpio_enable_write(val)
 
             case _:
-                raise NotImplemented(f"Invalid GPIO MMIO access address {hex(addr)}")
+                raise NotImplementedError(f"Invalid GPIO MMIO access address {hex(addr)}")
 
 # 0x07801000:"MMIO_CLOCK_STATUS", 0x07801004:"MMIO_STAGE_DEBUG",
 class DebugStatusModel(smallworld.state.models.MemoryMappedModel):
@@ -67,7 +67,7 @@ class DebugStatusModel(smallworld.state.models.MemoryMappedModel):
                 return struct.pack('<L', 0)
 
             case _:
-                raise NotImplemented(f"Invalid DebugStatus MMIO access address {hex(addr)}")
+                raise NotImplementedError(f"Invalid DebugStatus MMIO access address {hex(addr)}")
 
     def on_write(self, emu, addr, size, data) -> bytes:
         assert size == 4
@@ -82,4 +82,4 @@ class DebugStatusModel(smallworld.state.models.MemoryMappedModel):
                 print(f"POST code / Debug boot progress: {hex(val)}")
 
             case _:
-                raise NotImplemented(f"Invalid DebugStatus MMIO access address {hex(addr)}")
+                raise NotImplementedError(f"Invalid DebugStatus MMIO access address {hex(addr)}")

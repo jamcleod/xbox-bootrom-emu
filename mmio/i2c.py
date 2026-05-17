@@ -25,7 +25,7 @@ class I2cControllerModel(smallworld.state.models.MemoryMappedModel):
                 val = self.status_read()
 
             case _:
-                raise NotImplemented(f"Invalid I2C MMIO access address {hex(addr)}")
+                raise NotImplementedError(f"Invalid I2C MMIO access address {hex(addr)}")
 
         return struct.pack("<L", val)
 
@@ -38,4 +38,4 @@ class I2cControllerModel(smallworld.state.models.MemoryMappedModel):
             case 0x07860400:
                 self.cmd_write(val)
             case _:
-                raise NotImplemented(f"Invalid I2C MMIO access address {hex(addr)}")
+                raise NotImplementedError(f"Invalid I2C MMIO access address {hex(addr)}")

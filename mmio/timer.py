@@ -42,7 +42,7 @@ class TimerModel(smallworld.state.models.MemoryMappedModel):
             case 0x07802010:
                 val = self.read_value()
             case _:
-                raise NotImplemented(f"Invalid I2C MMIO access address {hex(addr)}")
+                raise NotImplementedError(f"Invalid I2C MMIO access address {hex(addr)}")
 
         return struct.pack("<L", val)
 
@@ -59,4 +59,4 @@ class TimerModel(smallworld.state.models.MemoryMappedModel):
             case 0x07802010:
                 self.write_value(val)
             case _:
-                raise NotImplemented(f"Invalid I2C MMIO access address {hex(addr)}")
+                raise NotImplementedError(f"Invalid I2C MMIO access address {hex(addr)}")

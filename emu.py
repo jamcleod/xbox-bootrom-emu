@@ -4,6 +4,7 @@ import smallworld
 import logging
 import struct
 
+from syscall import backup_sp, handle_syscall
 from mpu import AddMpuRegionModel, SetMpuEnableModel, ConfigureMpuSubregion, RUN_IN_USER_JAIL_ADDR, run_in_user_jail_start
 from mmio.fuses import ProdFuseModel, EntitlementFuseModel, SecFlagsFuseModel, UnkFusesModel, FuseCalibrationControllerModel
 from mmio.gpio import GpioModel, DebugStatusModel
@@ -166,5 +167,18 @@ unicorn = smallworld.emulators.UnicornEmulator(platform)
 # Add hook to start of `run_in_usr_jail` function to print out the jail entrypoint
 unicorn.hook_instruction(RUN_IN_USER_JAIL_ADDR, run_in_user_jail_start)
 
+# Add handler for syscalls
+unicorn.hook_instruction(0xffff190a, backup_sp)
+unicorn.hook_instruction(0xffff1914, handle_syscall)
+
 # Emulate our machine
 machine = machine.emulate(unicorn)
+
+#mem = unicorn.read_memory(0x3d000, 40)
+#
+#from binascii import hexlify
+#s = lambda x: hexlify(x).decode()
+#
+#print("\n".join([s(mem[i:i+4]) for i in range(0, 40, 4)]))
+print("pc =", hex(unicorn.read_register("pc")))
+print("sp =", hex(unicorn.read_register("sp")))

@@ -28,23 +28,33 @@ class CryptoEngineModel(smallworld.state.models.MemoryMappedModel):
     def __init__(self):
         super().__init__(0x07820000, 0x1000)
 
-        self.storage = {}
+        self.storage = {
+            0x7820290: 0
+        }
 
-    def read_status(self):
-        val = 1
-        print(f"[crypto] Read MMIO_CRYPTO_STATUS = {val}")
+    def read_status(self, emu):
+        pc = emu.read_register("pc")
+        if pc == 0xffff056c:
+            val = 0
+        else:
+            val = 1
+        #print(f"[crypto] Read MMIO_CRYPTO_STATUS = {val}")
         return val
 
     def on_read(self, emu, addr, size, _) -> bytes:
         assert size == 4
 
         match addr:
-            case 0x7820048 | 0x7820060:
+            case 0x7820048 | 0x7820060 | 0x7820290:
                 val = self.storage.get(addr, 0)
-                print(f"[crypto] Read {reg_name(addr)} = {hex(val)}")
+                #pc = emu.read_register("pc")
+                #print(f"[crypto] Read {reg_name(addr)} = {hex(val)} (pc=0x{pc:08x})")
+
+            case 0x7820208:
+                val = 0x400000
 
             case 0x782020c:
-                val = self.read_status()
+                val = self.read_status(emu)
 
             case _:
                 pc = emu.read_register("pc")
@@ -56,9 +66,17 @@ class CryptoEngineModel(smallworld.state.models.MemoryMappedModel):
         assert size == 4
         val = struct.unpack("<L", data)[0]
 
+        def print_log():
+            pass
+            #pc = emu.read_register("pc")
+            #print(f"[crypto] Write {reg_name(addr)} = {hex(val)} (pc=0x{pc:08x})")
+
         match addr:
+            case _ if addr in range(0x7820100, 0x7820300, 4):
+                print_log()
+
             case 0x7820048 | 0x7820060:
-                print(f"[crypto] Write {reg_name(addr)} = {hex(val)}")
+                print_log()
 
             case _:
                 pc = emu.read_register("pc")

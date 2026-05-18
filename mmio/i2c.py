@@ -9,7 +9,7 @@ class I2cControllerModel(smallworld.state.models.MemoryMappedModel):
         return 1
 
     def status_read(self):
-        return 1
+        return 0b101
 
     def cmd_write(self, val: int):
         print(f"I2C CMD Write {hex(val)}")

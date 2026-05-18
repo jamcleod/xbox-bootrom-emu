@@ -25,7 +25,7 @@ class EmmcControllerModel(smallworld.state.models.MemoryMappedModel):
 
     def write_is_data_ready(self, val):
         if val & 1 != 0:
-            print(f"[emmc] Data read requested for pos={hex(self.internal_buffer)}")
+            print(f"[emmc] Data read requested for pos={hex(self.configured_pos)}")
             self.fill_internal_buffer()
 
     def write_configured_pos(self, val):
